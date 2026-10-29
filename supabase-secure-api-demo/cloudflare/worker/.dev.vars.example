@@ -1,0 +1,6 @@
+# BACKEND_AUTH_TOKEN is the Worker-to-backend credential.
+# It must be different from the Supabase internal API key.
+# Create it with: openssl rand -base64 32
+# For a deployed Worker, use `npx wrangler secret put BACKEND_AUTH_TOKEN`
+# instead of committing this file.
+BACKEND_AUTH_TOKEN=

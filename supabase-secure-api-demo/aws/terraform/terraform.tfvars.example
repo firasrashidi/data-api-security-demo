@@ -1,0 +1,7 @@
+aws_region        = "us-east-1"
+availability_zone = "us-east-1a"
+name_prefix       = "supabase-secure-api-demo"
+instance_type     = "t3.small"
+
+# Do not put secret values in this file. deploy.sh writes them to Secrets Manager
+# after Terraform creates the empty secret shells.

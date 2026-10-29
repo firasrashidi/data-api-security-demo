@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "supabase-secure-api-demo",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-29",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "CF_ACCESS_TEAM_DOMAIN": "__CF_ACCESS_TEAM_DOMAIN__",
+    "CF_ACCESS_AUD": "__CF_ACCESS_AUD__"
+  },
+  "vpc_services": [
+    {
+      "binding": "PRIVATE_BACKEND",
+      "service_id": "00000000-0000-4000-8000-000000000000",
+      "remote": true
+    }
+  ]
+}

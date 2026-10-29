@@ -1,0 +1,21 @@
+{
+  "name": "secure-api-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "jose": "6.2.14"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261029.1",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7",
+    "wrangler": "4.155.0"
+  }
+}
