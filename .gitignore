@@ -1,7 +1,23 @@
-# Repo root is one level above the demo. Installs belong under
-# supabase-secure-api-demo/, where that directory's .gitignore applies.
 node_modules/
+dist/
+coverage/
+.wrangler/
+.dev.vars
+*.log
+.DS_Store
 
-# Empty lockfile created by an accidental command in this directory.
-# The real lockfiles live next to each package.json and stay tracked.
-/package-lock.json
+.env
+.env.local
+aws/backend/.env
+cloudflare/worker/.dev.vars
+
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
