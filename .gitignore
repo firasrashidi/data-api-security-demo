@@ -1,0 +1,7 @@
+# Repo root is one level above the demo. Installs belong under
+# supabase-secure-api-demo/, where that directory's .gitignore applies.
+node_modules/
+
+# Empty lockfile created by an accidental command in this directory.
+# The real lockfiles live next to each package.json and stay tracked.
+/package-lock.json
