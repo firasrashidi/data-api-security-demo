@@ -66,6 +66,8 @@ The integration script reports SKIP until the stack is deployed:
 tests/security-tests.sh
 ```
 
+Hand-run the same cases with [docs/curl-commands.md](docs/curl-commands.md).
+
 ## Deploy
 
 Follow [docs/deployment.md](docs/deployment.md) in order. The NAT Gateway is billable; run `aws/scripts/teardown.sh --yes` and `supabase/cleanup.sql` when you are finished.

@@ -50,7 +50,7 @@ Re-running that script rotates the same named secret. After rotation, update Sec
 
 `public.check_internal_api_key()` returns `void`, reads `x-internal-api-key` from `request.headers`, and compares a SHA-256 digest with the Vault secret. It raises PostgREST SQLSTATE `PGRST` with HTTP status 403. The message is the fixed string `Forbidden`.
 
-The function is `SECURITY DEFINER` because `anon` cannot read Vault. Its owner is `demo_vault_reader`, a `NOLOGIN` role with `SELECT` on `vault.decrypted_secrets` and execute on `extensions.digest(bytea, text)`. It has no bypass RLS attribute and no write privileges.
+The function is `SECURITY DEFINER` because `anon` cannot read Vault. Its owner is `demo_vault_reader`, a `NOLOGIN` role with `SELECT` on `vault.decrypted_secrets`, execute on `vault._crypto_aead_det_decrypt`, and execute on `extensions.digest(bytea, text)`. Selecting the view is not enough: the view calls the decrypt function as the current user. The role has no bypass RLS attribute and no write privileges.
 
 PostgREST invokes the hook after `SET ROLE`, so `anon`, `authenticated`, and `service_role` need `EXECUTE`. `PUBLIC` does not. The function rejects a direct `/rpc/check_internal_api_key` call when `request.path` contains that name. See the security model for the limitation this cannot remove.
 

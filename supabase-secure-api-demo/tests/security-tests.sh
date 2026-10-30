@@ -212,6 +212,11 @@ else
   write_denied=1
   for method in POST PATCH DELETE; do
     body="$tmpdir/f-${method}"
+    # PostgREST returns 400 for PATCH and DELETE with no filter before it checks grants.
+    target="${SUPABASE_URL%/}/rest/v1/customer_documents"
+    if [[ "$method" != "POST" ]]; then
+      target="${target}?id=eq.11111111-1111-4111-8111-111111111111"
+    fi
     status=$(request "$body" \
       -X "$method" \
       -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
@@ -220,7 +225,7 @@ else
       -H 'content-type: application/json' \
       -H 'prefer: return=representation' \
       --data '{"title":"should-not-persist","visibility":"public"}' \
-      "${SUPABASE_URL%/}/rest/v1/customer_documents")
+      "$target")
     if [[ "$status" != "401" && "$status" != "403" ]] || contains_secret "$body" || grep -F -q 'should-not-persist' "$body"; then
       write_denied=0
       fail F "${method} returned ${status}: $(redact "$(cat "$body")")"

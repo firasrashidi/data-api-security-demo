@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS public.customer_documents;
 DROP FUNCTION IF EXISTS public.check_internal_api_key();
 
 DO $cleanup$
+DECLARE
+  fn oid;
 BEGIN
   IF to_regclass('vault.secrets') IS NOT NULL THEN
     DELETE FROM vault.secrets
@@ -31,6 +33,15 @@ BEGIN
     IF to_regprocedure('extensions.digest(bytea, text)') IS NOT NULL THEN
       REVOKE EXECUTE ON FUNCTION extensions.digest(bytea, text) FROM demo_vault_reader;
     END IF;
+    FOR fn IN
+      SELECT p.oid
+      FROM pg_proc AS p
+      JOIN pg_namespace AS n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'vault'
+        AND p.proname = '_crypto_aead_det_decrypt'
+    LOOP
+      EXECUTE format('REVOKE ALL ON FUNCTION %s FROM demo_vault_reader', fn::regprocedure);
+    END LOOP;
     REVOKE CREATE, USAGE ON SCHEMA public FROM demo_vault_reader;
     BEGIN
       EXECUTE format('REVOKE demo_vault_reader FROM %I', CURRENT_USER);

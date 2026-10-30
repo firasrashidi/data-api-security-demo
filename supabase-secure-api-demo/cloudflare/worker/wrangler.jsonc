@@ -6,13 +6,13 @@
   "workers_dev": true,
   "preview_urls": false,
   "vars": {
-    "CF_ACCESS_TEAM_DOMAIN": "__CF_ACCESS_TEAM_DOMAIN__",
-    "CF_ACCESS_AUD": "__CF_ACCESS_AUD__"
+    "CF_ACCESS_TEAM_DOMAIN": "https://flat-bar-9194.cloudflareaccess.com",
+    "CF_ACCESS_AUD": "764bbf7880613ecda9cf4bab34036132461ad23b7d8ad4a39592e5cd826ab627"
   },
   "vpc_services": [
     {
       "binding": "PRIVATE_BACKEND",
-      "service_id": "00000000-0000-4000-8000-000000000000",
+      "service_id": "01a1897d-43cd-7cf3-9699-54c2899aa125",
       "remote": true
     }
   ]

@@ -95,7 +95,7 @@ curl -sS -i \
   "$SUPABASE_URL/rest/v1/customer_documents"
 ```
 
-Expect 401 or 403. A valid gateway secret did not grant `INSERT`.
+Expect 401 or 403. A valid gateway secret did not grant `INSERT`. `PATCH` and `DELETE` need `?id=eq.<uuid>` in this check. Without a filter, PostgREST returns 400 before it evaluates the grant.
 
 ## 9. Unauthorized calls keep failing
 

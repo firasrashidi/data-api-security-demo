@@ -76,6 +76,17 @@ BEGIN
     RAISE EXCEPTION 'pre-request function owner drifted from demo_vault_reader';
   END IF;
 
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_proc AS p
+    JOIN pg_namespace AS n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'vault'
+      AND p.proname = '_crypto_aead_det_decrypt'
+      AND has_function_privilege('demo_vault_reader', p.oid, 'EXECUTE')
+  ) THEN
+    RAISE EXCEPTION 'demo_vault_reader cannot execute vault._crypto_aead_det_decrypt';
+  END IF;
+
   SELECT p.proacl IS NULL
     INTO public_execute
   FROM pg_proc AS p

@@ -70,4 +70,6 @@ Some accounts reject `recovery_window_in_days = 0`. Set `secret_recovery_window_
 
 ## PostgREST older than the hosted Data API
 
-Hosted projects were upgraded to PostgREST 14. The `PGRST` SQLSTATE used here matches that generation. A project still on PostgREST 11 needs the legacy error shape documented in the [API security guide](https://supabase.com/docs/guides/api/securing-your-api). Check the version in the dashboard before changing the function.
+Hosted projects were upgraded to PostgREST 14. The `PGRST` SQLSTATE used here matches that generation, and the `detail` object must include both `status` and `headers`. A detail object with only `status` comes back as HTTP 500 and `PGRST121`. A project still on PostgREST 11 needs the legacy error shape documented in the [API security guide](https://supabase.com/docs/guides/api/securing-your-api). Check the version in the dashboard before changing the function.
+
+A valid secret that still returns `403` with message `Forbidden` usually means `demo_vault_reader` cannot execute `vault._crypto_aead_det_decrypt`. The pre-request function hides that error and fails closed. `supabase/audit.sql` checks the grant.

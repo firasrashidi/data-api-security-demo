@@ -39,6 +39,26 @@ $role$;
 
 GRANT USAGE ON SCHEMA vault TO demo_vault_reader;
 GRANT SELECT ON vault.decrypted_secrets TO demo_vault_reader;
+
+-- The view calls this function as the current user. SELECT on the view is not enough.
+DO $decrypt_grant$
+DECLARE
+  fn oid;
+BEGIN
+  SELECT p.oid
+    INTO fn
+  FROM pg_proc AS p
+  JOIN pg_namespace AS n ON n.oid = p.pronamespace
+  WHERE n.nspname = 'vault'
+    AND p.proname = '_crypto_aead_det_decrypt';
+
+  IF fn IS NULL THEN
+    RAISE EXCEPTION 'vault._crypto_aead_det_decrypt is missing';
+  END IF;
+
+  EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO demo_vault_reader', fn::regprocedure);
+END
+$decrypt_grant$;
 GRANT USAGE ON SCHEMA extensions TO demo_vault_reader;
 GRANT EXECUTE ON FUNCTION extensions.digest(bytea, text) TO demo_vault_reader;
 GRANT USAGE ON SCHEMA public TO demo_vault_reader;
@@ -74,7 +94,7 @@ DECLARE
 BEGIN
   headers_text := pg_catalog.current_setting('request.headers', true);
   IF headers_text IS NULL OR headers_text = '' THEN
-    headers := '{}'::jsonb;
+    headers := pg_catalog.jsonb_build_object();
   ELSE
     headers := headers_text::jsonb;
   END IF;
@@ -83,7 +103,10 @@ BEGIN
     provided := pg_catalog.btrim(headers ->> 'x-internal-api-key');
   END IF;
 
-  path_text := pg_catalog.coalesce(pg_catalog.current_setting('request.path', true), '');
+  path_text := pg_catalog.current_setting('request.path', true);
+  IF path_text IS NULL THEN
+    path_text := '';
+  END IF;
   IF pg_catalog.strpos(path_text, 'rpc/check_internal_api_key') > 0 THEN
     blocked_rpc := true;
   END IF;
@@ -120,7 +143,8 @@ BEGIN
         'code', '403'
       )::text,
       detail = pg_catalog.json_build_object(
-        'status', 403
+        'status', 403,
+        'headers', '{}'::json
       )::text;
   END IF;
 EXCEPTION
@@ -133,7 +157,8 @@ EXCEPTION
         'code', '403'
       )::text,
       detail = pg_catalog.json_build_object(
-        'status', 403
+        'status', 403,
+        'headers', '{}'::json
       )::text;
 END;
 $function$;
@@ -199,6 +224,17 @@ BEGIN
 
   IF NOT has_table_privilege('demo_vault_reader', 'vault.decrypted_secrets', 'SELECT') THEN
     RAISE EXCEPTION 'demo_vault_reader cannot select vault.decrypted_secrets';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_proc AS p
+    JOIN pg_namespace AS n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'vault'
+      AND p.proname = '_crypto_aead_det_decrypt'
+      AND has_function_privilege('demo_vault_reader', p.oid, 'EXECUTE')
+  ) THEN
+    RAISE EXCEPTION 'demo_vault_reader cannot execute vault._crypto_aead_det_decrypt';
   END IF;
 
   IF NOT has_function_privilege('anon', 'public.check_internal_api_key()', 'EXECUTE') THEN

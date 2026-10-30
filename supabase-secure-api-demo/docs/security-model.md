@@ -23,7 +23,7 @@ What was done instead:
 | --- | --- |
 | Owner | `demo_vault_reader`, not the migration superuser-equivalent role |
 | Role attributes | `NOLOGIN`, `NOINHERIT`, `NOCREATEDB`, `NOCREATEROLE`, `NOBYPASSRLS` |
-| Vault access | `SELECT` on `vault.decrypted_secrets` only. The function reads one named secret |
+| Vault access | `SELECT` on `vault.decrypted_secrets` and `EXECUTE` on `vault._crypto_aead_det_decrypt`. The function reads one named secret |
 | `search_path` | Empty, with fully qualified references |
 | Return value | `void`. No secret is selected into the result |
 | Errors | Fixed `Forbidden` / 403. `SQLERRM` is not returned |
